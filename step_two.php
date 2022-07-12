@@ -22,7 +22,7 @@ try {
     $tProdi = new mProdi($pdo);
     $a_prodi = $tProdi->getByKodeProdi($kodeProdi);
 
-    $a_mhs = $tProdi->getMahasiswaReservasi($kodeProdi, $stepAksi);
+    $a_mhs = $tProdi->getMahasiswa($kodeProdi, $stepAksi);
 } catch (\PDOException $e) {
     echo $e->getMessage();
 }

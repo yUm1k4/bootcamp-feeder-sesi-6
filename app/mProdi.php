@@ -65,7 +65,7 @@ class mProdi {
         return $a_data;
     }
 
-    public function getMahasiswaReservasi($kodeProdi, $status)
+    public function getMahasiswa($kodeProdi, $status)
     {
         if (empty($kodeProdi) or empty($status))
             return false;
