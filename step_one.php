@@ -5,12 +5,21 @@ use App\Connection as Connection;
 use App\mProdi;
 
 try {
-    // connect to the PostgreSQL database
+    session_start();
+
     $pdo = Connection::get()->connect();
     $tProdi = new mProdi($pdo);
     $a_data = $tProdi->getAll();
 } catch (\PDOException $e) {
     echo $e->getMessage();
+}
+
+// jika ada action submit
+if (!empty($_POST['act']) && $_POST['act'] == 'submit') {
+    session_start();
+    $_SESSION['KODEPRODI'] = $_POST['key'];
+
+    header('Location: step_two.php');
 }
 
 ?>
@@ -26,14 +35,14 @@ try {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
 
-    <title>PIN (Penomoran Ijzah Nasional)</title>
+    <title><?= $_SESSION['STEPAKSI'] == mProdi::RESERVASI ? 'Reservasi' : 'Pemasangan' ?> - PIN (Penomoran Ijzah Nasional)</title>
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="col-md-8 col-sm-12 container mt-3 mb-5">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h5 mb-0 text-gray-800">Pilih Program Studi</h1>
+            <h1 class="h5 mb-0 text-gray-800">Pilih Salah Satu Program Studi</h1>
             <a href="./" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>Kembali</a>
         </div>
         <hr>
@@ -52,13 +61,17 @@ try {
                             <td><?= $data['kode_prodi'] ?></td>
                             <td><?= $data['prodi'] ?></td>
                             <td>
-                                <button type="submit" type="button" class="btn btn-primary btn-block btn-sm" onclick="goToProccess(<?= $data['kode_prodi'] ?>)">Pilih</button>
+                                <form method="post">
+                                    <button type="submit" type="button" class="btn btn-primary btn-block btn-sm">Pilih</button>
+                                    <input type="hidden" name="act" value="submit">
+                                    <input type="hidden" name="key" value="<?= $data['kode_prodi'] ?>">
+                                </form>
                             </td>
                         </tr>
                     <?php } ?>
                 </tbody>
             </table>
-        </div>
+    </div>
     </div>
 </div>
 
@@ -76,31 +89,6 @@ try {
             new simpleDatatables.DataTable(datatablesSimple);
         }
     });
-
-    // form action submit then redirect to page
-    function goToProccess(kodeProdi) {
-        // get tahunIjazah then post tahunIjazah using post method
-        let tahunIjazah = document.getElementById('tahunIjazah').value;
-
-        // post javascript native
-        let form = document.createElement('form');
-        form.method = 'post';
-        form.action = './reservasi_hasil.php';
-        let inputTahunIjazah = document.createElement('input');
-        inputTahunIjazah.type = 'hidden';
-        inputTahunIjazah.name = 'tahunIjazah';
-        inputTahunIjazah.value = tahunIjazah;
-        form.appendChild(inputTahunIjazah);
-        let inputKodeProdi = document.createElement('input');
-        inputKodeProdi.type = 'hidden';
-        inputKodeProdi.name = 'kodeProdi';
-        inputKodeProdi.value = kodeProdi;
-        form.appendChild(inputKodeProdi);
-
-        // submit form
-        document.body.appendChild(form);
-        form.submit();
-    }
 </script>
 </body>
 </html>

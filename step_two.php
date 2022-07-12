@@ -4,15 +4,25 @@ require 'vendor/autoload.php';
 use App\Connection as Connection;
 use App\mProdi;
 
-// get kode_prodi from get url
-$kodeProdi = $_POST['kodeProdi'];
-$tahunIjazah = $_POST['tahunIjazah'];
+session_start();
+if (!empty($_SESSION['KODEPRODI'])) {
+    $kodeProdi = $_SESSION['KODEPRODI'];
+    $stepAksi = $_SESSION['STEPAKSI'];
+    //     echo '<pre>';
+    // print_r($stepAksi);
+    // echo '</pre>';
+    // die();
+} else {
+    header('Location: step_one.php');
+}
+
 try {
     // connect to the PostgreSQL database
     $pdo = Connection::get()->connect();
     $tProdi = new mProdi($pdo);
-    $a_prodi = $tProdi->getByKodeProdi($kodeProdi, $tahunIjazah);
-    $a_mhs = $tProdi->getMahasiswaReservasi($kodeProdi, $tahunIjazah);
+    $a_prodi = $tProdi->getByKodeProdi($kodeProdi);
+
+    $a_mhs = $tProdi->getMahasiswaReservasi($kodeProdi, $stepAksi);
 } catch (\PDOException $e) {
     echo $e->getMessage();
 }
@@ -38,7 +48,7 @@ try {
     <div class="col-md-10 col-sm-12 container mt-3 mb-5">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h2 class="h5 mb-0 text-gray-800">Periksa Daftar Lulusan <?= $a_prodi['prodi'] ?></h2>
-            <a href="./reservasi.php" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>Kembali</a>
+            <a href="./step_one.php" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>Kembali</a>
         </div>
 
         <div style="margin-top: 50px;">

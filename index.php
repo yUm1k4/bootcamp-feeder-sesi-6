@@ -2,6 +2,7 @@
 require 'vendor/autoload.php';
 
 use App\Connection as Connection;
+use App\mProdi;
 
 try {
     // connect to the PostgreSQL database
@@ -12,13 +13,10 @@ try {
 
 // jika ada action submit
 if (!empty($_POST['act']) && $_POST['act'] == 'submit') {
-    // set session reservasi
     session_start();
-    $_SESSION['STEPAKSI'] = $_POST['reservasi'];
-    echo '<pre>';
-    print_r($_SESSION);
-    echo '</pre>';
-    die();
+    $_SESSION['STEPAKSI'] = $_POST['key'];
+
+    header('Location: step_one.php');
 }
 
 ?>
@@ -45,24 +43,22 @@ if (!empty($_POST['act']) && $_POST['act'] == 'submit') {
 
         <div class="row">
             <div class="col-lg-6">
-                <!-- <form method="post">
+                <form method="post">
                     <button type="submit" class="jumbotron btn btn-lg btn-block btn-primary" style="border-color: #1ab394; background-color: #1ab394;font-size:130%">
                         <i class="fa fa-plus"></i> <strong> Reservasi Nomor Ijazah </strong>
                     </button>
                     <input type="hidden" name="act" value="submit">
-                </form> -->
-                <a href="./reservasi.php" style="text-decoration: none;">
-                    <button type="submit" class="jumbotron btn btn-lg btn-block btn-primary" style="border-color: #1ab394; background-color: #1ab394;font-size:130%">
-                        <i class="fa fa-plus"></i> <strong> Reservasi Nomor Ijazah </strong>
-                    </button>
-                </a>
+                    <input type="hidden" name="key" value="<?= mProdi::RESERVASI ?>">
+                </form>
             </div>
             <div class="col-lg-6">
-                <a href="./pemasangan.php" style="text-decoration: none;">
+                <form method="post">
                     <button type="submit" class="jumbotron btn btn-lg btn-block btn-info" style="border-color: #1ab394; background-color: #23c6c8;font-size:130%">
-                        <i class="fa fa-pencil"></i> <strong>Pemasangan Nomor Ijazah</strong>
+                        <i class="fa fa-pencil"></i> <strong> Nomor Ijazah</strong>
                     </button>
-                </a>
+                    <input type="hidden" name="act" value="submit">
+                    <input type="hidden" name="key" value="<?= mProdi::PEMASANGAN ?>">
+                </form>
             </div>
         </div>
 

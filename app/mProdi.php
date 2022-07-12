@@ -5,6 +5,8 @@ namespace App;
 class mProdi {
 
     const IDUNIV = '8e5d195a-0035-41aa-afef-db715a37b8da';
+    const RESERVASI = 'R';
+    const PEMASANGAN = 'P';
 
     /**
      * PDO object
@@ -41,7 +43,7 @@ class mProdi {
         return $a_data;
     }
 
-    public function getByKodeProdi($kodeProdi, $tahunIjazah)
+    public function getByKodeProdi($kodeProdi)
     {
         $sql = "select sms.kode_prodi, jp.nm_jenj_didik||' '||sms.nm_lemb as prodi
             from public.sms sms
@@ -63,8 +65,11 @@ class mProdi {
         return $a_data;
     }
 
-    public function getMahasiswaReservasi($kodeProdi, $tahunIjazah)
+    public function getMahasiswaReservasi($kodeProdi, $status)
     {
+        if (empty($kodeProdi) or empty($status))
+            return false;
+
         $sql = "select rpd.nipd, pd.nm_pd, kmhs.id_smt, kmhs.ips, kmhs.sks_smt, kmhs.ipk, kmhs.sks_total, jp.nm_jenj_didik, sem.smt
             from public.reg_pd rpd
             join public.peserta_didik pd using (id_pd)
@@ -122,13 +127,24 @@ class mProdi {
             }
 
             // ? Cek total sks yang ditempuh
-            if ((($value['jenjang'] == 'D1' || $value['jenjang'] == 'S2') && $value['total_sks'] < '12') ||
-                (($value['jenjang'] == 'D2') && $value['total_sks'] < '48') ||
-                (($value['jenjang'] == 'D3') && $value['total_sks'] < '84') ||
-                (($value['jenjang'] == 'D4' || $value['jenjang'] == 'S1') && $value['total_sks'] < '120') ||
-                (($value['jenjang'] == 'S3') && $value['total_sks'] < '18')) {
-                    $a_data[$key]['tidak_eligible'] = 1;
-                    $a_data[$key]['alasan'][4] = 'Total SKS yang ditempuh kurang dari syarat SKS';
+            if ($status == self::RESERVASI) {
+                if ((($value['jenjang'] == 'D1' || $value['jenjang'] == 'S2') && $value['total_sks'] < '12') ||
+                    (($value['jenjang'] == 'D2') && $value['total_sks'] < '48') ||
+                    (($value['jenjang'] == 'D3') && $value['total_sks'] < '84') ||
+                    (($value['jenjang'] == 'D4' || $value['jenjang'] == 'S1') && $value['total_sks'] < '120') ||
+                    (($value['jenjang'] == 'S3') && $value['total_sks'] < '18')) {
+                        $a_data[$key]['tidak_eligible'] = 1;
+                        $a_data[$key]['alasan'][4] = 'Total SKS yang ditempuh kurang dari syarat SKS';
+                }
+            } else if ($status == self::PEMASANGAN) {
+                if ((($value['jenjang'] == 'D1' || $value['jenjang'] == 'S2') && $value['total_sks'] < '36') ||
+                    (($value['jenjang'] == 'D2') && $value['total_sks'] < '72') ||
+                    (($value['jenjang'] == 'D3') && $value['total_sks'] < '108') ||
+                    (($value['jenjang'] == 'D4' || $value['jenjang'] == 'S1') && $value['total_sks'] < '144') ||
+                    (($value['jenjang'] == 'S3') && $value['total_sks'] < '42')) {
+                        $a_data[$key]['tidak_eligible'] = 1;
+                        $a_data[$key]['alasan'][4] = 'Total SKS yang ditempuh kurang dari syarat SKS';
+                }
             }
         }
 
